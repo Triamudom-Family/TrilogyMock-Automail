@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
+	<style>
+		body { font-family: 'IBM Plex Sans Thai', sans-serif; overscroll-behavior: none; }
+
+		.blob {
+			position: fixed;
+			border-radius: 50%;
+			filter: blur(80px);
+			opacity: 0.35;
+			pointer-events: none;
+			z-index: 0;
+		}
+
+		.glass-card {
+			background: rgba(255, 255, 255, 0.72);
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			border: 1.5px solid rgba(255, 255, 255, 0.9);
+			box-shadow:
+				0 4px 32px rgba(236, 72, 153, 0.10),
+				0 1.5px 8px rgba(236, 72, 153, 0.06),
+				inset 0 1px 0 rgba(255, 255, 255, 0.8);
+		}
+
+		@keyframes fadeUp {
+			from { opacity: 0; transform: translateY(18px); }
+			to   { opacity: 1; transform: translateY(0); }
+		}
+		.fade-up   { animation: fadeUp 0.55s cubic-bezier(.22,.68,0,1.2) both; }
+		.fade-up-1 { animation-delay: 0.05s; }
+		.fade-up-2 { animation-delay: 0.13s; }
+		.fade-up-3 { animation-delay: 0.22s; }
+		.fade-up-4 { animation-delay: 0.30s; }
+		.fade-up-5 { animation-delay: 0.38s; }
+		.fade-up-6 { animation-delay: 0.46s; }
+	</style>
+</head>
+
+<body class="bg-gradient-to-br from-rose-50 via-pink-100 to-fuchsia-100" style="min-height:100dvh">
+
+	<!-- Decorative blobs -->
+	<div class="blob" style="width:420px;height:420px;background:#f9a8d4;top:-80px;left:-100px;"></div>
+	<div class="blob" style="width:320px;height:320px;background:#fbcfe8;bottom:-60px;right:-60px;"></div>
+	<div class="blob" style="width:200px;height:200px;background:#fde68a;bottom:80px;left:30px;opacity:0.18;"></div>
+
+	<div class="relative z-10 mx-auto max-w-3xl px-4 py-10 sm:px-6">
+		<div class="glass-card overflow-hidden rounded-3xl fade-up fade-up-1">
+
+			<!-- Header -->
+			<div class="bg-gradient-to-tr from-pink-400 via-rose-400 to-rose-500 px-8 py-10 text-white text-center sm:px-12 fade-up fade-up-2">
+				<!-- <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/30 px-4 py-1 text-xs">
+					ข้อมูลสำคัญ — Mock Test
+				</div> -->
+				<h1 class="text-3xl font-bold tracking-tight sm:text-4xl">ข้อมูลการเข้าสู่ระบบ Mock Test</h1>
+				<!-- <h2 class="mt-2 text-2xl font-semibold sm:text-3xl opacity-90">{studentName}</h2> -->
+				<div class="mt-5 inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/30 px-4 py-2 text-sm">
+					Mock x Triam The Trilogy for #TU90
+				</div>
+			</div>
+
+			<div class="px-8 py-8 sm:px-12 space-y-8">
+
+				<!-- Intro -->
+				<!-- <section class="fade-up fade-up-2">
+					<p class="text-base leading-7 text-gray-700">
+						เรียน <span class="font-semibold text-gray-900">{studentName}</span><br />
+						ขอแจ้งข้อมูลบัญชีผู้ใช้สำหรับการเข้าสอบ <span class="font-semibold text-gray-900">Mock x Triam The Trilogy for #TU90  by Triamudom Family </span>
+						กรุณาเก็บรักษาข้อมูลนี้ไว้เป็นความลับและไม่เผยแพร่แก่ผู้อื่น
+					</p>
+				</section> -->
+
+				<!-- Credentials -->
+				<section class="fade-up fade-up-3">
+					<h3 class="text-xs font-semibold tracking-widest text-pink-400 uppercase mb-4">ข้อมูลบัญชีผู้ใช้</h3>
+					<ul class="rounded-2xl border border-pink-100 overflow-hidden divide-y divide-pink-50">
+						<li class="flex items-center gap-4 px-5 py-4 bg-white/80">
+							<div class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-pink-100 text-pink-600">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+								</svg>
+							</div>
+							<div class="flex-1 min-w-0">
+								<p class="text-xs text-pink-400 font-medium mb-0.5">Username</p>
+								<p class="text-base font-bold text-gray-900 tracking-wide">{username}</p>
+							</div>
+						</li>
+						<li class="flex items-center gap-4 px-5 py-4 bg-white/80">
+							<div class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-pink-100 text-pink-600">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+								</svg>
+							</div>
+							<div class="flex-1 min-w-0">
+								<p class="text-xs text-pink-400 font-medium mb-0.5">Password</p>
+								<p class="text-base font-bold text-gray-900 tracking-wide">{password}</p>
+							</div>
+						</li>
+					</ul>
+				</section>
+
+				<!-- Test Details -->
+				<section class="fade-up fade-up-3">
+					<h3 class="text-xs font-semibold tracking-widest text-pink-400 uppercase mb-4">รายละเอียดการสอบ</h3>
+					<div class="rounded-2xl border border-pink-100 bg-pink-50/60 px-5 py-5">
+						<div class="grid grid-cols-2 gap-4">
+							<div class="flex items-start gap-3">
+								<div class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-white border border-pink-100 text-pink-400">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									</svg>
+								</div>
+								<div>
+									<p class="text-xs text-pink-400 font-medium mb-0.5">เปิดระบบการสอบ</p>
+									<p class="text-sm font-semibold text-rose-800">10 พฤษภาคม 2569</p>
+								</div>
+							</div>
+							<div class="flex items-start gap-3">
+								<div class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-white border border-pink-100 text-pink-400">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									</svg>
+								</div>
+								<div>
+									<p class="text-xs text-pink-400 font-medium mb-0.5">ปิดระบบการสอบ</p>
+									<p class="text-sm font-semibold text-rose-800">31 พฤษภาคม 2569</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- CTA Buttons -->
+				<section class="fade-up fade-up-3">
+					<div class="grid grid-cols-2 gap-3">
+						<a href="https://auth.dugga.com/" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 px-4 py-3.5 text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity">
+							เข้าสู่ระบบสอบ
+						</a>
+						<a href="https://drive.google.com/file/d/1wcg2npYd9e56uZzEPSE_bXZYknYxM85g/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center rounded-xl border-2 border-pink-300 bg-white px-4 py-3.5 text-sm font-semibold text-pink-600 hover:bg-pink-50 transition-colors">
+							คู่มือการใช้ระบบการสอบ
+						</a>
+					</div>
+				</section>
+
+				<!-- Instructions -->
+				<section class="fade-up fade-up-4">
+					<h3 class="text-xs font-semibold tracking-widest text-pink-400 uppercase mb-4">วิธีเข้าสู่ระบบ</h3>
+					<ol class="rounded-2xl border border-pink-100 overflow-hidden divide-y divide-pink-50">
+						<li class="flex items-start gap-3 px-4 py-3 text-sm text-gray-700 bg-white/80">
+							<span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-pink-100 text-[11px] font-semibold text-pink-600 mt-0.5">1</span>
+							<span>เข้าสู่เว็บไซต์ระบบการสอบออนไลน์</span>
+						</li>
+						<li class="flex items-start gap-3 px-4 py-3 text-sm text-gray-700 bg-white/80">
+							<span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-pink-100 text-[11px] font-semibold text-pink-600 mt-0.5">2</span>
+							<span>กรอก <span class="font-semibold">Username</span> และ <span class="font-semibold">Password</span> ตามที่ระบุข้างต้น</span>
+						</li>
+						<li class="flex items-start gap-3 px-4 py-3 text-sm text-gray-700 bg-white/80">
+							<span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-pink-100 text-[11px] font-semibold text-pink-600 mt-0.5">3</span>
+							<span>เริ่มทำข้อสอบตามวันและเวลาที่กำหนด</span>
+						</li>
+					</ol>
+					<!-- <div class="mt-4 rounded-xl border border-amber-100 bg-amber-50/60 px-4 py-4 text-sm leading-7 text-gray-700">
+						<span class="font-semibold text-amber-600">หมายเหตุ:</span> กรุณาเข้าระบบก่อนเวลาสอบอย่างน้อย 10 นาที
+						และตรวจสอบให้แน่ใจว่าอุปกรณ์และอินเทอร์เน็ตพร้อมใช้งาน
+					</div> -->
+				</section>
+
+				<!-- Contact -->
+				<section class="fade-up fade-up-5">
+					<h3 class="text-xs font-semibold tracking-widest text-pink-400 uppercase mb-4">ติดต่อสอบถามเพิ่มเติม</h3>
+					<div class="grid grid-cols-2 gap-3">
+						<div class="rounded-xl border border-pink-100 bg-pink-50/40 px-4 py-3.5">
+							<p class="mb-1 text-xs text-pink-400 font-medium">อีเมล</p>
+							<p class="text-sm font-semibold text-gray-700">admin@triamudomfamily.org</p>
+						</div>
+						<div class="rounded-xl border border-pink-100 bg-pink-50/40 px-4 py-3.5">
+							<p class="mb-1 text-xs text-pink-400 font-medium">Line Official Account</p>
+							<p class="text-sm font-semibold text-gray-700">@triamudom</p>
+						</div>
+					</div>
+				</section>
+
+				<!-- Signature -->
+				<section class="border-t border-pink-100 pt-6 fade-up fade-up-5">
+					<p class="text-sm text-gray-500">ขอแสดงความนับถือ</p>
+					<p class="mt-3 text-base font-semibold text-gray-900">ทีมงานผู้ดูแลระบบ Mock Test</p>
+					<p class="mt-0.5 text-sm text-gray-500">สมาคมผู้ปกครองและครูโรงเรียนเตรียมอุดมศึกษา</p>
+				</section>
+
+			</div>
+
+			<!-- Footer -->
+			<div class="border-t border-pink-100 bg-pink-50/40 px-8 py-4 sm:px-12 fade-up fade-up-6">
+				<div class="flex flex-col sm:flex-row items-center justify-center gap-2 text-xs text-pink-400 text-center">
+					<a href="" target="_blank" rel="noopener noreferrer"
+						class="inline-flex items-center gap-1.5 hover:text-pink-600 transition">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
+							<path fill-rule="evenodd"
+								d="M12 2C6.477 2 2 6.59 2 12.253c0 4.53 2.865 8.37 6.839 9.727.5.095.682-.222.682-.494 0-.244-.009-.89-.014-1.747-2.782.617-3.37-1.37-3.37-1.37-.454-1.178-1.11-1.492-1.11-1.492-.908-.636.069-.623.069-.623 1.004.072 1.532 1.06 1.532 1.06.892 1.574 2.341 1.119 2.91.856.091-.664.35-1.119.636-1.376-2.221-.259-4.555-1.137-4.555-5.062 0-1.118.389-2.032 1.029-2.748-.103-.26-.446-1.302.098-2.714 0 0 .84-.276 2.75 1.05A9.303 9.303 0 0112 6.844c.85.004 1.705.117 2.504.343 1.909-1.326 2.747-1.05 2.747-1.05.546 1.412.203 2.454.1 2.714.64.716 1.028 1.63 1.028 2.748 0 3.936-2.338 4.8-4.566 5.054.359.318.678.946.678 1.907 0 1.377-.012 2.487-.012 2.826 0 .275.18.594.688.493C19.138 20.62 22 16.78 22 12.253 22 6.59 17.523 2 12 2z"
+								clip-rule="evenodd" />
+						</svg>
+						Github
+					</a>
+					<span class="hidden sm:inline text-pink-200">•</span>
+					<a href="" target="_blank"
+						rel="noopener noreferrer" class="hover:text-pink-600 transition">AGPL-3.0</a>
+					<span class="hidden sm:inline text-pink-200">|</span>
+					<span>Email Send v2.2.2</span>
+					<!-- <span class="hidden sm:inline text-pink-200">•</span>
+					<span>For Organtogo</span> -->
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+</body>
+
+</html>
