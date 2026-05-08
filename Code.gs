@@ -1,9 +1,6 @@
 function myFunction() {
-	// if (MailApp.getRemainingDailyQuota() == 0.0) return;
-	// else Logger.log(MailApp.getRemainingDailyQuota());
-	
 	Logger.log(MailApp.getRemainingDailyQuota());
-	retryEmailByRow(546);
+	// retryEmailByRow(546);
 }
 
 function doGet() {
@@ -172,29 +169,6 @@ function onFormSubmit(e) {
 		responseSheet.getRangeList(['C' + row, 'H' + row, 'I' + row, 'J' + row, 'K' + row, 'L' + row, 'M' + row, 'Q' + row, 'R' + row, 'S' + row, 'T' + row, 'U' + row, 'AE' + row]).setHorizontalAlignment('center');
 	} finally {
 		lock.releaseLock();
-	}
-}
-
-function getColumn(track) {
-	switch (track) {
-		case 'ภาษา - ภาษาฝรั่งเศส':
-			return 2;
-		case 'ภาษา - ภาษาเยอรมัน':
-			return 3;
-		case 'ภาษา - ภาษาญี่ปุ่น':
-			return 4;
-		case 'ภาษา - ภาษาจีน':
-			return 5;
-		case 'ภาษา - ภาษาสเปน':
-			return 6;
-		case 'ภาษา - ภาษาเกาหลี':
-			return 7;
-		case 'ภาษา - คณิตศาสตร์':
-			return 8;
-		case 'วิทยาศาสตร์ - คณิตศาสตร์':
-			return 9;
-		default:
-			throw new Error("Invalid Track: " + track);
 	}
 }
 
@@ -699,7 +673,7 @@ function generateHtmlBody(data) {
 						</a>
 						<span style="display: inline-block; vertical-align: middle"> - </span>
 						<a
-							href="https://github.com/arckanop/AppScript-ID-Lookup/blob/membership-lookup/LICENSE"
+							href="https://github.com/Triamudom-Family/TrilogyMock-Automail/blob/master/LICENSE.md"
 							target="_blank"
 							rel="noopener noreferrer"
 							style="color: #4b5563; text-decoration: none"
@@ -724,4 +698,125 @@ function escapeHtml_(text) {
 		.replace(/>/g, '&gt;')
 		.replace(/"/g, '&quot;')
 		.replace(/'/g, '&#39;');
+}
+
+const MOCK_SHEET_NAME = 'Credentials';
+
+// 1-indexed column numbers — adjust to match your sheet layout
+const COL_EMAIL    = 1; // A — recipient email address
+const COL_NAME     = 2; // B — student name (used in plain-text greeting)
+const COL_USERNAME = 3; // C — Dugga username
+const COL_PASSWORD = 4; // D — Dugga password
+const COL_SENT     = 5; // E — "TRUE" once sent successfully
+const COL_NOTES    = 6; // F — error messages / retry notes
+
+function sendAllCredentials() {
+	const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(MOCK_SHEET_NAME);
+	if (!sheet) throw new Error('Sheet "' + MOCK_SHEET_NAME + '" not found');
+
+	const lastRow = sheet.getLastRow();
+	if (lastRow < 2) {
+		console.log('No data rows found.');
+		return;
+	}
+
+	const numCols = Math.max(COL_SENT, COL_NOTES);
+	const data    = sheet.getRange(2, 1, lastRow - 1, numCols).getValues();
+	let sent = 0, failed = 0;
+
+	for (let i = 0; i < data.length; i++) {
+		const row        = i + 2;
+		const sentStatus = String(data[i][COL_SENT - 1] || '').trim();
+
+		if (sentStatus === 'TRUE') continue;
+
+		if (MailApp.getRemainingDailyQuota() < 1) {
+			console.warn('Email quota exhausted. Stopped at row %s.', row);
+			break;
+		}
+
+		try {
+			mockSendRow_(row, sheet, data[i]);
+			sent++;
+		} catch (err) {
+			sheet.getRange(row, COL_NOTES).setValue('Error: ' + err.message);
+			console.error('Row %s failed: %s', row, err.message);
+			failed++;
+		}
+	}
+
+	console.log('Done. Sent: %s, Failed: %s', sent, failed);
+}
+
+function retrySendByRow(row) {
+	row = Number(row);
+	if (!row || row < 2) throw new Error('Invalid row number: ' + row);
+
+	const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(MOCK_SHEET_NAME);
+	if (!sheet) throw new Error('Sheet "' + MOCK_SHEET_NAME + '" not found');
+
+	const numCols = Math.max(COL_SENT, COL_NOTES);
+	const rowData = sheet.getRange(row, 1, 1, numCols).getValues()[0];
+
+	try {
+		mockSendRow_(row, sheet, rowData);
+		sheet.getRange(row, COL_NOTES).setValue('Retried OK');
+		console.log('Retry succeeded for row %s', row);
+	} catch (err) {
+		sheet.getRange(row, COL_NOTES).setValue('Retry Failed: ' + err.message);
+		throw err;
+	}
+}
+
+function mockSendRow_(row, sheet, rowData) {
+	if (MailApp.getRemainingDailyQuota() < 1) throw new Error('No email quota remaining today');
+
+	const email    = String(rowData[COL_EMAIL    - 1] || '').trim();
+	const name     = String(rowData[COL_NAME     - 1] || '').trim();
+	const username = String(rowData[COL_USERNAME - 1] || '').trim();
+	const password = String(rowData[COL_PASSWORD - 1] || '').trim();
+
+	if (!email)    throw new Error('Missing email address');
+	if (!username) throw new Error('Missing username');
+	if (!password) throw new Error('Missing password');
+
+	const subject   = 'ข้อมูลการเข้าสู่ระบบ Mock Test — Mock x Triam The Trilogy for #TU90';
+	const htmlBody  = mockBuildHtmlBody_(username, password);
+	const plainText = mockBuildPlainText_(username, password, name);
+
+	GmailApp.sendEmail(email, subject, plainText, {
+		htmlBody : htmlBody,
+		name     : 'ระบบ Mock Test — Triamudom Family',
+		noReply  : true,
+	});
+
+	sheet.getRange(row, COL_SENT ).setValue('TRUE');
+	sheet.getRange(row, COL_NOTES).setValue('');
+	console.log('Sent to %s (row %s)', email, row);
+}
+
+function mockBuildHtmlBody_(username, password) {
+	const html = HtmlService.createHtmlOutputFromFile('compiled').getContent();
+	return html
+		.replace(/\{username\}/g, escapeHtml_(username))
+		.replace(/\{password\}/g, escapeHtml_(password));
+}
+
+function mockBuildPlainText_(username, password, name) {
+	const greeting = name ? 'เรียนคุณ ' + name + '\n\n' : '';
+	return [
+		greeting + 'ข้อมูลการเข้าสู่ระบบ Mock Test',
+		'Mock x Triam The Trilogy for #TU90',
+		'',
+		'Username : ' + username,
+		'Password : ' + password,
+		'',
+		'เข้าสู่ระบบสอบ    : https://auth.dugga.com/',
+		'เปิดระบบการสอบ : 10 พฤษภาคม 2569',
+		'ปิดระบบการสอบ  : 31 พฤษภาคม 2569',
+		'',
+		'ติดต่อสอบถาม : admin@triamudomfamily.org | Line: @triamudom',
+		'',
+		'อีเมลฉบับนี้ถูกส่งโดยอัตโนมัติ กรุณาอย่าตอบกลับ',
+	].join('\n');
 }
