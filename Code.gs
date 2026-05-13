@@ -1,17 +1,8 @@
+function myFunction() {
+}
+
 function onFormSubmit(e) {
-	const sheet = e.range.getSheet();
-	const row = e.range.getRow();
-	const rowData = sheet.getRange(row, 1, 1, 13).getValues()[0];
-
-	const track = getTrack(String(rowData[7] || '').trim());
-
-	try {
-		const { username, password } = fetchCredentials(track);
-		sendEmail(row, sheet, rowData, username, password);
-	} catch (err) {
-		sheet.getRange(row, 13).setValue('Error: ' + err.message);
-		throw err;
-	}
+	processRow(e.range.getRow(), e.range.getSheet());
 }
 
 function retryEmailByRow(row) {
@@ -21,13 +12,16 @@ function retryEmailByRow(row) {
 	const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Form Responses');
 	if (!sheet) throw new Error('Sheet not found');
 
+	processRow(row, sheet);
+}
+
+function processRow(row, sheet) {
 	const rowData = sheet.getRange(row, 1, 1, 13).getValues()[0];
 	const track = getTrack(String(rowData[7] || '').trim());
 
 	try {
 		const { username, password } = fetchCredentials(track);
 		sendEmail(row, sheet, rowData, username, password);
-		console.log('Retry succeeded for row %s', row);
 	} catch (err) {
 		sheet.getRange(row, 13).setValue('Error: ' + err.message);
 		throw err;
@@ -46,20 +40,17 @@ function fetchCredentials(track) {
 
 	const indexCol = { sm: 9, am: 10, el: 11 }[track];
 	const maxCol = { sm: 14, am: 15, el: 16 }[track];
-	const credCols = { sm: [1, 2], am: [3, 4], el: [5, 6] }[track];
+	const credCol = { sm: 1, am: 3, el: 5 }[track];
 
-	const indexCell = codes.getRange(2, indexCol);
-	const index = Number(indexCell.getValue()) || 1;
-	const max = Number(codes.getRange(2, maxCol).getValue()) || 0;
+	const meta = codes.getRange(2, indexCol, 1, maxCol - indexCol + 1).getValues()[0];
+	const index = Number(meta[0]) || 1;
+	const max = Number(meta[maxCol - indexCol]) || 0;
 
 	if (index > max) throw new Error('Credential quota exceeded for track ' + track + ' (' + index + '/' + max + ')');
 
-	const dataRow = index + 2;
+	const [username, password] = codes.getRange(index + 2, credCol, 1, 2).getValues()[0].map(v => String(v).trim());
 
-	const username = String(codes.getRange(dataRow, credCols[0]).getValue()).trim();
-	const password = String(codes.getRange(dataRow, credCols[1]).getValue()).trim();
-
-	indexCell.setValue(index + 1);
+	codes.getRange(2, indexCol).setValue(index + 1);
 
 	return { username, password };
 }
@@ -72,15 +63,16 @@ function sendEmail(row, sheet, rowData, username, password) {
 	const surname = String(rowData[3] || '').trim();
 
 	if (!email) throw new Error('Missing email address');
+	console.log('Sending to: %s | username: %s', email, username);
 
-	const subject = 'ข้อมูลการเข้าสู่ระบบ Mock Test — Mock x Triam The Trilogy for #TU90';
+	const subject = 'ข้อมูลการเข้าสู่ระบบ Mock x Triam The Trilogy for TU90';
 	const htmlBody = generateHtmlBody(username, password);
 	const plainText = generatePlainText(name, surname, username, password);
 
 	GmailApp.sendEmail(email, subject, plainText, {
 		htmlBody: htmlBody,
 		name: 'Mock x Triam The Trilogy',
-		noReply: true,
+		// noReply: true,
 	});
 
 	sheet.getRange(row, 13).setValue('Sent successfully');
@@ -105,7 +97,7 @@ function generatePlainText(name, surname, username, password) {
 		'Password: ' + password,
 		'',
 		'รายละเอียดการสอบ',
-		'เปิดระบบการสอบ: 10 พฤษภาคม 2569',
+		'เปิดระบบการสอบ: 15 พฤษภาคม 2569',
 		'ปิดระบบการสอบ: 31 พฤษภาคม 2569',
 		'',
 		'เข้าสู่ระบบสอบ: https://auth.dugga.com/',
