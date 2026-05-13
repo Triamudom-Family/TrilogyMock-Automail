@@ -1,8 +1,16 @@
 function myFunction() {
+	Logger.log(MailApp.getRemainingDailyQuota());
 }
 
 function onFormSubmit(e) {
-	processRow(e.range.getRow(), e.range.getSheet());
+	const lock = LockService.getDocumentLock() || LockService.getScriptLock();
+	lock.waitLock(30000);
+
+	try {
+		processRow(e.range.getRow(), e.range.getSheet());
+	} finally {
+		lock.releaseLock();
+	}
 }
 
 function retryEmailByRow(row) {
@@ -12,15 +20,28 @@ function retryEmailByRow(row) {
 	const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Form Responses');
 	if (!sheet) throw new Error('Sheet not found');
 
-	processRow(row, sheet);
+	const rowData = sheet.getRange(row, 1, 1, 14).getValues()[0];
+	const storedUsername = String(rowData[12] || '').trim();
+	const storedPassword = String(rowData[13] || '').trim();
+
+	if (storedUsername && storedPassword && !storedUsername.startsWith('Error:')) {
+		try {
+			sendEmail(row, sheet, rowData, storedUsername, storedPassword);
+		} catch (err) {
+			sheet.getRange(row, 13).setValue('Error: ' + err.message);
+			throw err;
+		}
+	} else {
+		processRow(row, sheet, false);
+	}
 }
 
-function processRow(row, sheet) {
+function processRow(row, sheet, increment = true) {
 	const rowData = sheet.getRange(row, 1, 1, 13).getValues()[0];
 	const track = getTrack(String(rowData[7] || '').trim());
 
 	try {
-		const { username, password } = fetchCredentials(track);
+		const { username, password } = fetchCredentials(track, increment);
 		sendEmail(row, sheet, rowData, username, password);
 	} catch (err) {
 		sheet.getRange(row, 13).setValue('Error: ' + err.message);
@@ -34,7 +55,7 @@ function getTrack(track) {
 	return 'el';
 }
 
-function fetchCredentials(track) {
+function fetchCredentials(track, increment = true) {
 	const codes = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Codes');
 	if (!codes) throw new Error('Sheet "Codes" not found');
 
@@ -50,7 +71,7 @@ function fetchCredentials(track) {
 
 	const [username, password] = codes.getRange(index + 2, credCol, 1, 2).getValues()[0].map(v => String(v).trim());
 
-	codes.getRange(2, indexCol).setValue(index + 1);
+	if (increment) codes.getRange(2, indexCol).setValue(index + 1);
 
 	return { username, password };
 }
@@ -72,10 +93,12 @@ function sendEmail(row, sheet, rowData, username, password) {
 	GmailApp.sendEmail(email, subject, plainText, {
 		htmlBody: htmlBody,
 		name: 'Mock x Triam The Trilogy',
-		// noReply: true,
+		// noreply: true,
 	});
 
-	sheet.getRange(row, 13).setValue('Sent successfully');
+	sheet.getRange(row, 13).setValue(username);
+	sheet.getRange(row, 14).setValue(password);
+	sheet.getRange(row, 15).setValue('Sent successfully');
 	console.log(`Sent to ${email} (row ${row})`);
 }
 
